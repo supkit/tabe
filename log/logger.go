@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+// logger zap logger
+var logger *zap.Logger
+
+// New init
 func New(filePath string, opt ...Option) *zap.Logger {
 	// 设置一些基本日志格式 具体含义还比较好理解，直接看zap源码也不难懂
 	encoder := getEncoder()

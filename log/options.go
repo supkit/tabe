@@ -2,13 +2,9 @@ package log
 
 import (
 	rotate "github.com/lestrrat-go/file-rotatelogs"
-	"go.uber.org/zap"
 	"io"
 	"time"
 )
-
-// logger zap logger
-var logger *zap.Logger
 
 // Options 参数
 type Options struct {
