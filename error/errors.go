@@ -31,18 +31,18 @@ func (e Error) New(code uint32, message string) Error {
 	}
 }
 
-// getCode get code
-func (e Error) getCode() uint32 {
+// GetCode get code
+func (e Error) GetCode() uint32 {
 	return e.code
 }
 
-// getMessage get message
-func (e Error) getMessage() string {
+// GetMessage get message
+func (e Error) GetMessage() string {
 	return e.message
 }
 
 // Parse parse error message
-func (e Error) Parse(error string) (code uint32, message string) {
+func Parse(error string) (code uint32, message string) {
 	reg, err := regexp.Compile(`framework error code:([0-9]+) message:(.+)`)
 	if err != nil {
 		return SystemErrCode, err.Error()
