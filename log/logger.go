@@ -73,6 +73,7 @@ func Info(format string, args ...any) {
 	logger.Info(msg)
 }
 
+// Warn warn level
 func Warn(format string, args ...any) {
 	msg := fmt.Sprintf(format, args...)
 	logger.Warn(msg)
