@@ -1,5 +1,10 @@
 package config
 
+import (
+	"gopkg.in/yaml.v3"
+	"os"
+)
+
 type Config struct {
 	Env   string `yaml:"env"`
 	Debug bool   `yaml:"debug"`
@@ -16,6 +21,17 @@ type Config struct {
 	} `yaml:"client"`
 }
 
-func Watch() {
+// Watch load config
+func Watch() (config Config, err error) {
 	// ...
+	data, err := os.ReadFile("./config.yaml")
+	if err != nil {
+		return
+	}
+	err = yaml.Unmarshal(data, &config)
+	if err != nil {
+		return
+	}
+
+	return config, err
 }
