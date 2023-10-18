@@ -1,6 +1,9 @@
 package log
 
 import (
+	"context"
+	"github.com/segmentio/ksuid"
+	"sync"
 	"testing"
 	"time"
 )
@@ -17,8 +20,25 @@ func TestDebug(t *testing.T) {
 		WithMaxAge(time.Hour * 7 * 24),
 		WithFileFormat(".%Y-%m-%d"),
 	}
+	ctx := context.Background()
+	ctx = context.WithValue(context.Background(), "rid", ksuid.New().String())
 	New("./log/access.log", opt...)
-	Debug("test debug: %d", 1)
+
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		Debug(ctx, "test debug: %d", 1008612)
+	}()
+	go func() {
+		defer wg.Done()
+		Info(ctx, "test debug: %d", 1008613)
+	}()
+	go func() {
+		defer wg.Done()
+		Warn(ctx, "test debug: %d", 1008614)
+	}()
+	wg.Wait()
 }
 
 func TestInfo(t *testing.T) {
@@ -27,7 +47,7 @@ func TestInfo(t *testing.T) {
 		WithFileFormat(".%Y-%m-%d"),
 	}
 	New("./log/access.log", opt...)
-	Info("info data: %s", "hi")
+	Info(context.Background(), "info data: %s", "hi")
 }
 
 func TestError(t *testing.T) {
@@ -38,7 +58,7 @@ func TestError(t *testing.T) {
 		WithCallerSkip(0),
 	}
 	New("./log/access.log", opt...)
-	Error("error data: %s", time.Now().Format("2006-01-02 15:04:05"))
+	Error(context.Background(), "error data: %s", time.Now().Format("2006-01-02 15:04:05"))
 }
 
 func TestWarn(t *testing.T) {
@@ -48,7 +68,7 @@ func TestWarn(t *testing.T) {
 		WithDistWarnLevel(true),
 	}
 	New("./log/access.log", opt...)
-	Warn("warn data: %s", "hi")
+	Warn(context.Background(), "warn data: %s", "hi")
 }
 
 func TestFatal(t *testing.T) {
@@ -57,5 +77,5 @@ func TestFatal(t *testing.T) {
 		WithFileFormat(".%Y-%m-%d"),
 	}
 	New("./log/access.log", opt...)
-	Fatal("fatal data")
+	Fatal(context.Background(), "fatal data")
 }

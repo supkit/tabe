@@ -1,7 +1,9 @@
 package log
 
 import (
+	"context"
 	"fmt"
+	"github.com/segmentio/ksuid"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"time"
@@ -18,6 +20,12 @@ var defaultCallerSkip = 1
 
 // defaultFileFormat 默认日志文件格式
 var defaultFileFormat = "%Y-%m-%d"
+
+// defaultRid requestId
+var defaultRid = ksuid.New().String()
+
+// ridKey key
+var ridKey = "rid"
 
 // New init
 func New(filePath string, opt ...Option) *zap.Logger {
@@ -61,32 +69,36 @@ func New(filePath string, opt ...Option) *zap.Logger {
 	return logger
 }
 
+// With context
+func With(ctx context.Context) *zap.Logger {
+	rid := ctx.Value(ridKey)
+	if rid == nil {
+		rid = defaultRid
+	}
+	return logger.With(zap.String(ridKey, rid.(string)))
+}
+
 // Debug debug level
-func Debug(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	logger.Debug(msg)
+func Debug(ctx context.Context, format string, args ...any) {
+	With(ctx).Debug(fmt.Sprintf(format, args...))
 }
 
 // Info info level
-func Info(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	logger.Info(msg)
+func Info(ctx context.Context, format string, args ...any) {
+	With(ctx).Info(fmt.Sprintf(format, args...))
 }
 
 // Warn warn level
-func Warn(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	logger.Warn(msg)
+func Warn(ctx context.Context, format string, args ...any) {
+	With(ctx).Warn(fmt.Sprintf(format, args...))
 }
 
 // Error error level
-func Error(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	logger.Error(msg)
+func Error(ctx context.Context, format string, args ...any) {
+	With(ctx).Error(fmt.Sprintf(format, args...))
 }
 
 // Fatal fatal level
-func Fatal(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	logger.Fatal(msg)
+func Fatal(ctx context.Context, format string, args ...any) {
+	With(ctx).Fatal(fmt.Sprintf(format, args...))
 }
