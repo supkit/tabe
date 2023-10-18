@@ -19,13 +19,6 @@ func WithMode(mode string) Option {
 	}
 }
 
-// WithAddr set address
-func WithAddr(addr string) Option {
-	return func(o *Options) {
-		o.Addr = addr
-	}
-}
-
 // WithRouter set router
 func WithRouter(router func(engine *gin.Engine)) Option {
 	return func(o *Options) {

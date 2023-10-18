@@ -15,9 +15,8 @@ func TestNew(t *testing.T) {
 
 	opt := []Option{
 		WithMode(gin.DebugMode),
-		WithAddr(":8081"),
 		WithRouter(router),
 	}
 
-	New(opt...)
+	New(":8082", opt...)
 }

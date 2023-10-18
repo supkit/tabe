@@ -6,10 +6,10 @@ import (
 )
 
 // New create http server
-func New(opt ...Option) {
+func New(address string, opt ...Option) {
 	options := Options{
 		Mode: gin.DebugMode,
-		Addr: ":80",
+		Addr: address,
 	}
 
 	for _, o := range opt {
