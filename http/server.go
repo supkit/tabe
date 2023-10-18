@@ -5,11 +5,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Server http server run
-func Server(addr string, router func(engine *gin.Engine)) {
+// New create http server
+func New(opt ...Option) {
+	options := Options{
+		Mode: gin.DebugMode,
+		Addr: ":80",
+	}
+
+	for _, o := range opt {
+		o(&options)
+	}
+
 	engine := gin.New()
-	router(engine)
-	err := engine.Run(addr)
+	gin.SetMode(options.Mode)
+
+	// register router
+	options.Router(engine)
+
+	err := engine.Run(options.Addr)
+
 	if err != nil {
 		fmt.Printf("gin http server run error: %v\n", err)
 	}
