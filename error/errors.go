@@ -2,65 +2,48 @@ package error
 
 import (
 	"fmt"
-	"regexp"
-	"strconv"
 )
 
 // Error def error
 type Error struct {
 	code    uint32
 	message string
+	arg     []any
 }
 
 // errMessage error message format
-var errMessage = "tabe framework error code:%d message:%s"
-
-// SystemErrCode system error code
-var SystemErrCode = uint32(900001)
+var errMessage = "system error code:%d message:%s"
 
 // Error interface instance of error
 func (e Error) Error() string {
-	return fmt.Sprintf(errMessage, e.code, e.message)
+	return fmt.Sprintf(errMessage, e.Code(), e.Message())
+}
+
+// Errorf error format
+func (e Error) Errorf(code uint32, message string) func(arg ...any) error {
+	return func(arg ...any) error {
+		return e.New(code, message, arg...)
+	}
 }
 
 // New create error
-func (e Error) New(code uint32, message string) Error {
+func (e Error) New(code uint32, message string, arg ...any) Error {
 	return Error{
 		code:    code,
 		message: message,
+		arg:     arg,
 	}
 }
 
-// GetCode get code
-func (e Error) GetCode() uint32 {
+// Code get code
+func (e Error) Code() uint32 {
 	return e.code
 }
 
-// GetMessage get message
-func (e Error) GetMessage() string {
+// Message get message
+func (e Error) Message() string {
+	if len(e.arg) > 0 {
+		return fmt.Sprintf(e.message, e.arg...)
+	}
 	return e.message
-}
-
-// Parse parse error message
-func Parse(error string) (code uint32, message string) {
-	reg, err := regexp.Compile(`framework error code:([0-9]+) message:(.+)`)
-	if err != nil {
-		return SystemErrCode, err.Error()
-	}
-
-	match := reg.FindStringSubmatch(error)
-	if len(match) == 0 {
-		return SystemErrCode, error
-	}
-
-	c, err := strconv.Atoi(match[1])
-	if err != nil {
-		return SystemErrCode, err.Error()
-	}
-
-	if len(match) < 3 {
-		return SystemErrCode, "match error message fail"
-	}
-
-	return uint32(c), match[2]
 }
