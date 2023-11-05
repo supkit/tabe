@@ -24,7 +24,7 @@ type Config struct {
 // Watch load config
 func Watch() (config Config, err error) {
 	// ...
-	data, err := os.ReadFile("./config.yaml")
+	data, err := os.ReadFile("./tabe.yaml")
 	if err != nil {
 		return
 	}

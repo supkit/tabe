@@ -1,0 +1,8 @@
+env: prod
+debug: false
+log:
+  fileName: log/server.log
+  maxAgeDay: 7
+  fileFormat: '%Y-%m-%d'
+  distWarnLevel: true
+  callerSkip: 1

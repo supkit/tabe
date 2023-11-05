@@ -7,6 +7,9 @@ import (
 
 func TestWatch(t *testing.T) {
 	config, err := Watch()
-	fmt.Println(config)
-	fmt.Println(err)
+	if err != nil {
+		fmt.Printf("config error: %v\n", err)
+		return
+	}
+	fmt.Printf("config: %+v\n", config)
 }
