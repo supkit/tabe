@@ -17,7 +17,7 @@ func TestError_New(t *testing.T) {
 		fmt.Printf("error=%v\n", err.Error())
 	}
 
-	err = ErrFoo("custom error")
+	err = ErrFoo("custom foo error")
 
 	if err, ok := err.(Error); ok {
 		fmt.Printf("foo code=%d message=%s\n", err.Code(), err.Message())
