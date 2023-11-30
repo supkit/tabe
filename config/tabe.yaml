@@ -6,3 +6,10 @@ log:
   fileFormat: '%Y-%m-%d'
   distWarnLevel: true
   callerSkip: 1
+client:
+  - name: mysql.basic
+    target: dsn://user:pass@tcp(127.0.0.1:3306)/dbName?charset=utf8mb4&parseTime=true
+    timeout: 1000
+  - name: redis.basic
+    target: ip://127.0.0.1:6379
+    timeout: 1000

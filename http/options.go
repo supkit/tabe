@@ -2,7 +2,7 @@ package http
 
 import "github.com/gin-gonic/gin"
 
-// Option set
+// Options set
 type Options struct {
 	Addr   string
 	Mode   string
