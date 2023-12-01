@@ -1,5 +1,5 @@
 package redis
 
-func NewClient() {
+func New(name string) {
 
 }

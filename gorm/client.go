@@ -5,12 +5,22 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"strings"
+	"time"
 )
 
-type Options struct {
-	DSN string `yaml:"DSN"`
-}
+// DefaultStringSize string 类型字段的默认长度
+const DefaultStringSize uint = 256
 
+// DefaultMaxIdleConn 空闲连接数
+const DefaultMaxIdleConn int = 10
+
+// DefaultMaxOpenConn 并发连接数
+const DefaultMaxOpenConn int = 20
+
+// DefaultConnMaxLifetime 超时时间
+const DefaultConnMaxLifetime time.Duration = time.Minute * 10
+
+// New 实例化一个连接
 func New(name string, opts ...Option) (*gorm.DB, error) {
 	conf, err := config.Watch()
 	if err != nil {
@@ -25,18 +35,38 @@ func New(name string, opts ...Option) (*gorm.DB, error) {
 		}
 	}
 
-	options := Options{}
+	options := Options{
+		DefaultStringSize: DefaultStringSize,
+		MaxIdleConn:       DefaultMaxIdleConn,
+		MaxOpenConn:       DefaultMaxOpenConn,
+		ConnMaxLifetime:   DefaultConnMaxLifetime,
+	}
 
 	for _, o := range opts {
 		o(&options)
 	}
 
-	return gorm.Open(
-		mysql.New(
-			mysql.Config{
-				DSN: options.DSN,
-			},
-		),
-		&gorm.Config{},
+	mysqlConfig := mysql.Config{
+		DSN:                       options.DSN,
+		DefaultStringSize:         options.DefaultStringSize,
+		DisableDatetimePrecision:  true,
+		DontSupportRenameIndex:    true,
+		DontSupportRenameColumn:   true,
+		SkipInitializeWithVersion: false,
+	}
+
+	db, err := gorm.Open(
+		mysql.New(mysqlConfig), &gorm.Config{},
 	)
+
+	conn, err := db.DB()
+	if err != nil {
+		return db, err
+	}
+
+	conn.SetMaxIdleConns(options.MaxIdleConn)
+	conn.SetMaxOpenConns(options.MaxIdleConn)
+	conn.SetConnMaxLifetime(options.ConnMaxLifetime)
+
+	return db, err
 }
