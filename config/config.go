@@ -57,7 +57,7 @@ func GetClientByName(name string) (client ConfigClient, err error) {
 	}
 
 	if len(client.Name) == 0 {
-		err = errors.New(fmt.Sprintf("invalid client name"))
+		err = errors.New(fmt.Sprintf("invalid client name: %s", name))
 	}
 
 	return
