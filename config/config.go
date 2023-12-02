@@ -5,6 +5,10 @@ import (
 	"os"
 )
 
+// config 配置
+var config Config
+
+// Config 结构
 type Config struct {
 	Env   string `yaml:"env"`
 	Debug bool   `yaml:"debug"`
@@ -26,9 +30,9 @@ type ConfigClient struct {
 }
 
 // Watch load config
-func Watch() (config Config, err error) {
+func Watch(path string) (err error) {
 	// ...
-	data, err := os.ReadFile("../config/tabe.yaml")
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return
 	}
@@ -38,11 +42,11 @@ func Watch() (config Config, err error) {
 		return
 	}
 
-	return config, err
+	return err
 }
 
 // GetClientByName get client
-func GetClientByName(name string, config Config) ConfigClient {
+func GetClientByName(name string) ConfigClient {
 	client := ConfigClient{}
 	for _, v := range config.Client {
 		if v.Name == name {

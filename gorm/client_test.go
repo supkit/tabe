@@ -2,6 +2,7 @@ package gorm
 
 import (
 	"fmt"
+	"github.com/supkit/tabe/config"
 	"testing"
 	"time"
 )
@@ -26,6 +27,11 @@ func (m *User) TableName() string {
 }
 
 func TestNew(t *testing.T) {
+	err := config.Watch("../config/tabe.yaml")
+	if err != nil {
+		fmt.Println("config error")
+	}
+
 	db, err := New("mysql.basic")
 	fmt.Printf("DB %v err %v\n", db, err)
 

@@ -6,7 +6,7 @@ import (
 )
 
 func TestWatch(t *testing.T) {
-	config, err := Watch()
+	err := Watch("tabe.yaml")
 	if err != nil {
 		fmt.Printf("config error: %v\n", err)
 		return
