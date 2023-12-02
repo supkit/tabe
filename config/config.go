@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"gopkg.in/yaml.v3"
 	"os"
 )
@@ -47,6 +48,7 @@ func Watch(path string) (err error) {
 
 // GetClientByName get client
 func GetClientByName(name string) ConfigClient {
+	fmt.Printf("config: %+v\n", config)
 	client := ConfigClient{}
 	for _, v := range config.Client {
 		if v.Name == name {
