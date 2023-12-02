@@ -22,7 +22,11 @@ const DefaultConnMaxLifetime time.Duration = time.Minute * 10
 
 // New 实例化一个连接
 func New(name string, opts ...Option) (*gorm.DB, error) {
-	client := config.GetClientByName(name)
+	client, err := config.GetClientByName(name)
+	if err != nil {
+		return &gorm.DB{}, err
+	}
+
 	if strings.Contains(client.Target, "dsn") {
 		dsn := strings.Replace(client.Target, "dsn://", "", -1)
 		opts = []Option{
