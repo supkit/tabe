@@ -54,6 +54,10 @@ func New(name string, opts ...Option) (*gorm.DB, error) {
 		mysql.New(mysqlConfig), &gorm.Config{},
 	)
 
+	if err != nil {
+		return db, err
+	}
+
 	conn, err := db.DB()
 	if err != nil {
 		return db, err
