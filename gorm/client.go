@@ -18,7 +18,7 @@ const DefaultMaxIdleConn int = 10
 const DefaultMaxOpenConn int = 20
 
 // DefaultConnMaxLifetime 超时时间
-const DefaultConnMaxLifetime time.Duration = time.Minute * 10
+const DefaultConnMaxLifetime time.Duration = time.Minute * 3
 
 // New 实例化一个连接
 func New(name string, opts ...Option) (*gorm.DB, error) {
