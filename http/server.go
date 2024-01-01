@@ -56,7 +56,7 @@ func Handler(handler HandlerFunc) gin.HandlerFunc {
 				rsp.Code = 10000
 				rsp.Message = "system error"
 			}
-			rsp.Data = []string{}
+			rsp.Data = data
 		} else {
 			rsp.Code = 0
 			rsp.Message = "success"
