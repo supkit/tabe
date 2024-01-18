@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	error2 "github.com/supkit/tabe/error"
@@ -49,12 +50,10 @@ func Handler(handler HandlerFunc) gin.HandlerFunc {
 		data, err := handler(ctx)
 		rsp.ID = ctx.Value("rid").(string)
 		if err != nil {
-			if err, ok := err.(error2.Error); ok {
+			var err error2.Error
+			if errors.As(err, &err) {
 				rsp.Code = err.Code()
 				rsp.Message = err.Message()
-			} else {
-				rsp.Code = 10000
-				rsp.Message = "system error"
 			}
 			rsp.Data = data
 		} else {
