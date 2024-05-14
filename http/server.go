@@ -9,7 +9,7 @@ import (
 )
 
 // HandlerFunc handler func
-type HandlerFunc func(c *gin.Context) (data any, err error)
+type HandlerFunc[T any] func(c *gin.Context, req T) (data any, err error)
 
 // New create http server
 func New(address string, opt ...Option) {
@@ -44,10 +44,11 @@ type ResponseData struct {
 }
 
 // Handler handler
-func Handler(handler HandlerFunc) gin.HandlerFunc {
+func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		rsp := ResponseData{}
-		data, err := handler(ctx)
+		err := ctx.BindJSON(&req)
+		data, err := handler(ctx, req)
 		rsp.ID = ctx.Value("rid").(string)
 		if err != nil {
 			var err error2.Error
