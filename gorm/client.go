@@ -68,7 +68,7 @@ func New(name string, opts ...Option) (*gorm.DB, error) {
 	}
 
 	conn.SetMaxIdleConns(options.MaxIdleConn)
-	conn.SetMaxOpenConns(options.MaxIdleConn)
+	conn.SetMaxOpenConns(options.MaxOpenConn)
 	conn.SetConnMaxLifetime(options.ConnMaxLifetime)
 
 	return db, err
