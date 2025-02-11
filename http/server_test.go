@@ -28,5 +28,6 @@ type UserReq struct {
 }
 
 func User(ctx *gin.Context, req UserReq) (data any, err error) {
+	data = req.Name
 	return
 }

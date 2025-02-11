@@ -47,14 +47,19 @@ type ResponseData struct {
 func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		rsp := ResponseData{}
-		if err := ctx.BindJSON(&req); err != nil {
-			fmt.Printf("debug bind json error: %v\n", err)
-			ctx.JSON(http.StatusForbidden, rsp)
-			return
+		if ctx.Request.Header.Get("Content-Type") == "application/json" && ctx.Request.Body != nil {
+			if err := ctx.ShouldBindJSON(&req); err != nil {
+				fmt.Printf("debug bind json error: %v\n", err)
+			}
 		}
 
 		data, err := handler(ctx, req)
-		rsp.ID = ctx.Value("rid").(string)
+		rid, ok := ctx.Value("rid").(string)
+		if !ok {
+			rid = ""
+		}
+		rsp.ID = rid
+
 		if err != nil {
 			var err error2.Error
 			if errors.As(err, &err) {
