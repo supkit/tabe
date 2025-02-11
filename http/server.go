@@ -48,6 +48,7 @@ func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		rsp := ResponseData{}
 		if err := ctx.BindJSON(&req); err != nil {
+			fmt.Printf("bind json error: %v\n", err)
 			return
 		}
 
