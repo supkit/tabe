@@ -47,7 +47,10 @@ type ResponseData struct {
 func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		rsp := ResponseData{}
-		err := ctx.BindJSON(&req)
+		if err := ctx.BindJSON(&req); err != nil {
+			return
+		}
+
 		data, err := handler(ctx, req)
 		rsp.ID = ctx.Value("rid").(string)
 		if err != nil {
