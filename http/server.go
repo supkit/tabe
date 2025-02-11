@@ -49,7 +49,7 @@ func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 		rsp := ResponseData{}
 		if err := ctx.BindJSON(&req); err != nil {
 			fmt.Printf("debug bind json error: %v\n", err)
-			return
+			err = nil
 		}
 
 		data, err := handler(ctx, req)
