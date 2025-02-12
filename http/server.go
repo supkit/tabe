@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	error2 "github.com/supkit/tabe/error"
 	"net/http"
+	"strings"
 )
 
 // HandlerFunc handler func
@@ -47,9 +48,34 @@ type ResponseData struct {
 func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		rsp := ResponseData{}
-		if ctx.Request.Header.Get("Content-Type") == "application/json" && ctx.Request.Body != nil {
+		contentType := ctx.Request.Header.Get("Content-Type")
+		fmt.Println(contentType)
+
+		// bind json
+		if strings.Contains(contentType, "application/json") {
 			if err := ctx.ShouldBindJSON(&req); err != nil {
-				fmt.Printf("debug bind json error: %v\n", err)
+				rsp = catchError(err, err.Error())
+				ctx.JSON(http.StatusOK, rsp)
+				return
+			}
+		}
+
+		// bind queryString
+		if strings.Contains(contentType, "text/html") || len(contentType) == 0 {
+			if err := ctx.ShouldBindQuery(&req); err != nil {
+				rsp = catchError(err, err.Error())
+				ctx.JSON(http.StatusOK, rsp)
+				return
+			}
+		}
+
+		// bind formData => multipart/form-data || application/x-www-form-urlencoded
+		if strings.Contains(contentType, "multipart/form-data") ||
+			strings.Contains(contentType, "application/x-www-form-urlencoded") {
+			if err := ctx.ShouldBind(&req); err != nil {
+				rsp = catchError(err, err.Error())
+				ctx.JSON(http.StatusOK, rsp)
+				return
 			}
 		}
 
@@ -75,4 +101,24 @@ func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 
 		ctx.JSON(http.StatusOK, rsp)
 	}
+}
+
+func catchError(err error, message string) (rsp ResponseData) {
+	rsp = ResponseData{}
+	var err2 error2.Error
+	if len(message) == 0 {
+		message = "unknown error"
+	}
+
+	if errors.As(err, &err2) {
+		rsp.Code = err2.Code()
+		rsp.Message = err2.Message()
+		rsp.Data = nil
+	} else {
+		rsp.Code = 1
+		rsp.Message = message
+		rsp.Data = nil
+	}
+
+	return
 }
