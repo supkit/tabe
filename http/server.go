@@ -49,12 +49,11 @@ func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		rsp := ResponseData{}
 		contentType := ctx.Request.Header.Get("Content-Type")
-		fmt.Println(contentType)
 
 		// bind json
 		if strings.Contains(contentType, "application/json") {
 			if err := ctx.ShouldBindJSON(&req); err != nil {
-				rsp = catchError(err, err.Error())
+				rsp = errorMessage(err, err.Error())
 				ctx.JSON(http.StatusOK, rsp)
 				return
 			}
@@ -63,7 +62,7 @@ func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 		// bind queryString
 		if strings.Contains(contentType, "text/html") || len(contentType) == 0 {
 			if err := ctx.ShouldBindQuery(&req); err != nil {
-				rsp = catchError(err, err.Error())
+				rsp = errorMessage(err, err.Error())
 				ctx.JSON(http.StatusOK, rsp)
 				return
 			}
@@ -73,7 +72,7 @@ func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 		if strings.Contains(contentType, "multipart/form-data") ||
 			strings.Contains(contentType, "application/x-www-form-urlencoded") {
 			if err := ctx.ShouldBind(&req); err != nil {
-				rsp = catchError(err, err.Error())
+				rsp = errorMessage(err, err.Error())
 				ctx.JSON(http.StatusOK, rsp)
 				return
 			}
@@ -87,23 +86,19 @@ func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 		rsp.ID = rid
 
 		if err != nil {
-			var err error2.Error
-			if errors.As(err, &err) {
-				rsp.Code = err.Code()
-				rsp.Message = err.Message()
-			}
-			rsp.Data = data
-		} else {
-			rsp.Code = 0
-			rsp.Message = "success"
-			rsp.Data = data
+			rsp = errorMessage(err, err.Error())
+			ctx.JSON(http.StatusOK, rsp)
+			return
 		}
 
+		rsp.Code = 0
+		rsp.Message = "success"
+		rsp.Data = data
 		ctx.JSON(http.StatusOK, rsp)
 	}
 }
 
-func catchError(err error, message string) (rsp ResponseData) {
+func errorMessage(err error, message string) (rsp ResponseData) {
 	rsp = ResponseData{}
 	var err2 error2.Error
 	if len(message) == 0 {
