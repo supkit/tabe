@@ -2,9 +2,9 @@ package http
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	error2 "github.com/supkit/tabe/error"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -32,7 +32,7 @@ func New(address string, opt ...Option) {
 	err := engine.Run(options.Addr)
 
 	if err != nil {
-		fmt.Printf("gin http server run error: %v\n", err)
+		log.Fatal("gin http server run error: " + err.Error())
 	}
 }
 
@@ -52,7 +52,7 @@ func Handler[T any](handler HandlerFunc[T], req T) gin.HandlerFunc {
 
 		// bind json
 		if strings.Contains(contentType, "application/json") {
-			if err := ctx.ShouldBindJSON(&req); err != nil {
+			if err := ctx.ShouldBindJSON(&req); err != nil && err.Error() != "EOF" {
 				rsp = errorMessage(err, err.Error())
 				ctx.JSON(http.StatusOK, rsp)
 				return
@@ -110,7 +110,7 @@ func errorMessage(err error, message string) (rsp ResponseData) {
 		rsp.Message = err2.Message()
 		rsp.Data = nil
 	} else {
-		rsp.Code = 1
+		rsp.Code = 1001
 		rsp.Message = message
 		rsp.Data = nil
 	}
