@@ -8,7 +8,7 @@ log:
   callerSkip: 1
 client:
   - name: mysql.basic
-    target: dsn://root:Sean@2020@tcp(101.32.179.165:3306)/basic?charset=utf8mb4&parseTime=true
+    target: dsn://user:password@tcp(127.0.0.1:6603)/dbName?charset=utf8mb4&parseTime=true
     timeout: 1000
   - name: redis.basic
     target: ip://127.0.0.1:6379
