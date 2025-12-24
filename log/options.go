@@ -52,8 +52,10 @@ func WithCallerSkip(skip int) Option {
 }
 
 // WithHook 增加一个配置函数
-func WithHooks(hooks ...zapcore.WriteSyncer) Option {
-	return func(o *Options) {}
+func WithHook(hook zapcore.WriteSyncer) Option {
+	return func(o *Options) {
+		o.Hooks = append(o.Hooks, hook)
+	}
 }
 
 // NewWriter new writer

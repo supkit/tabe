@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"fmt"
 	"github.com/segmentio/ksuid"
 	"sync"
 	"testing"
@@ -78,4 +79,28 @@ func TestFatal(t *testing.T) {
 	}
 	New("./log/access.log", opt...)
 	Fatal(context.Background(), "fatal data")
+}
+
+type WriteSyncer struct {
+}
+
+func (t *WriteSyncer) Write(p []byte) (n int, err error) {
+	fmt.Printf("Hook 收到日志内容: %s\n", string(p))
+	return len(p), nil
+}
+
+func (t *WriteSyncer) Sync() error {
+	return nil
+}
+
+func TestHook(t *testing.T) {
+	hook := &WriteSyncer{}
+
+	opt := []Option{
+		WithMaxAge(time.Hour * 7 * 24),
+		WithFileFormat(".%Y-%m-%d"),
+		WithHook(hook),
+	}
+	New("./log/access.log", opt...)
+	Info(context.Background(), "info data: %s", "hi")
 }
