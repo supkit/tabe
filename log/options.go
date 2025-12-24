@@ -2,6 +2,7 @@ package log
 
 import (
 	rotate "github.com/lestrrat-go/file-rotatelogs"
+	"go.uber.org/zap/zapcore"
 	"io"
 	"time"
 )
@@ -16,6 +17,7 @@ type Options struct {
 	DistWarnLevel bool
 	// CallerSkip 跳过的调用者数量
 	CallerSkip int
+	Hooks      []zapcore.WriteSyncer
 }
 
 // Option 调用参数工具函数
@@ -47,6 +49,11 @@ func WithCallerSkip(skip int) Option {
 	return func(o *Options) {
 		o.CallerSkip = skip
 	}
+}
+
+// WithHook 增加一个配置函数
+func WithHooks(hooks ...zapcore.WriteSyncer) Option {
+	return func(o *Options) {}
 }
 
 // NewWriter new writer

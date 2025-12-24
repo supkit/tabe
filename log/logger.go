@@ -36,6 +36,7 @@ func New(filePath string, opt ...Option) *zap.Logger {
 		FileFormat:    defaultFileFormat,
 		DistWarnLevel: false,
 		CallerSkip:    defaultCallerSkip,
+		Hooks:         []zapcore.WriteSyncer{},
 	}
 
 	for _, o := range opt {
@@ -46,7 +47,6 @@ func New(filePath string, opt ...Option) *zap.Logger {
 	infoLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl <= zapcore.WarnLevel
 	})
-
 	warnLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl > zapcore.WarnLevel
 	})
@@ -56,13 +56,23 @@ func New(filePath string, opt ...Option) *zap.Logger {
 	if options.DistWarnLevel {
 		filePath = filePath + "-error"
 	}
-
 	warnWriter := NewWriter(filePath, options)
+
+	infoSyncs := []zapcore.WriteSyncer{zapcore.AddSync(infoWriter)}
+	warnSyncs := []zapcore.WriteSyncer{zapcore.AddSync(warnWriter)}
+
+	for _, hook := range options.Hooks {
+		infoSyncs = append(infoSyncs, hook)
+		warnSyncs = append(warnSyncs, hook)
+	}
+
+	infoMultiWriter := zapcore.NewMultiWriteSyncer(infoSyncs...)
+	warnMultiWriter := zapcore.NewMultiWriteSyncer(warnSyncs...)
 
 	// 最后创建具体的Logger
 	core := zapcore.NewTee(
-		zapcore.NewCore(encoder, zapcore.AddSync(infoWriter), infoLevel),
-		zapcore.NewCore(encoder, zapcore.AddSync(warnWriter), warnLevel),
+		zapcore.NewCore(encoder, infoMultiWriter, infoLevel),
+		zapcore.NewCore(encoder, warnMultiWriter, warnLevel),
 	)
 
 	logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(options.CallerSkip))
